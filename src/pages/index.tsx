@@ -38,16 +38,6 @@ import { isLoginState, uidState } from '../atoms'
 import { useRouter } from 'next/router'
 
 const Home: NextPage = () => {
-  const router = useRouter()
-  const isLogin = useRecoilValue(isLoginState)
-  const loginUid = useRecoilValue(uidState)
-
-  useEffect(() => {
-    if (isLogin === false) {
-      router.push('/welcome')
-    }
-  }, [isLogin])
-
   const [todos, setTodos] = useState([
     {
       id: '',
@@ -59,16 +49,30 @@ const Home: NextPage = () => {
       isDraft: false
     }
   ])
-
+  const [filteringStatus, setFilteringStatus] = useState('NONE')
+  const [filteringPriority, setFilteringPriority] = useState('None')
   const [sort, setSort] = useState('')
   // ソートはデフォルトが昇順になっている
+  const [keyword, setKeyword] = useState('')
+  const [switchTodos, setSwitchTodos] = useState('all')
+
+  const router = useRouter()
+  const isLogin = useRecoilValue(isLoginState)
+  const loginUid = useRecoilValue(uidState)
+
+  useEffect(() => {
+    if (isLogin === false) {
+      router.push('/welcome')
+    }
+  }, [isLogin])
+
+
   const q = query(
     collection(db, 'todos'),
     where('isDraft', '==', false),
     where('isTrash', '==', false),
     orderBy('create')
   )
-  const [keyword, setKeyword] = useState('')
 
   useEffect(() => {
     const unSub = onSnapshot(q, (querySnapshot) => {
@@ -89,9 +93,6 @@ const Home: NextPage = () => {
     })
     return () => unSub()
   }, [])
-
-  const [filteringStatus, setFilteringStatus] = useState('NONE')
-  const [filteringPriority, setFilteringPriority] = useState('None')
 
   const filteringStatusChange = (event: SelectChangeEvent) => {
     setFilteringStatus(event.target.value as string)
@@ -143,7 +144,6 @@ const Home: NextPage = () => {
     }
   }
 
-  const [switchTodos, setSwitchTodos] = useState('all')
   const switchClick = () => {
     if (switchTodos === 'all') {
       setSwitchTodos('my todo')
