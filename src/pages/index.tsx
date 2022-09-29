@@ -66,7 +66,6 @@ const Home: NextPage = () => {
     }
   }, [isLogin])
 
-
   const q = query(
     collection(db, 'todos'),
     where('isDraft', '==', false),
@@ -76,9 +75,8 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const unSub = onSnapshot(q, (querySnapshot) => {
-      setTodos(
-        querySnapshot.docs.map((todo) => {
-          const {id, title, status, priority, isDraft, isTrash, author } = todo.data()
+      const latestTodoList = querySnapshot.docs.map((todo) => {
+        const { id, title, status, priority, isDraft, isTrash, author }  = todo.data()
         return {
           id,
           title,
@@ -89,9 +87,9 @@ const Home: NextPage = () => {
           isDraft,
           isTrash,
           author
-          }
-        })
-      )
+        }
+      })
+      setTodos(latestTodoList)
     })
     return () => unSub()
   }, [])
@@ -135,7 +133,7 @@ const Home: NextPage = () => {
       update: serverTimestamp()
     })
   }
-  
+
   const changeSort = (e: SelectChangeEvent) => {
     setSort(e.target.value)
 
@@ -154,7 +152,12 @@ const Home: NextPage = () => {
     }
   }
 
-  const STATUSOPTIONS = [{ text: '- - - - - - -', value:'NONE'},  {text: 'NOT STARTED', value:'NOT STARTED'}, {text: 'DOING', value: 'DOING'}, {text: 'DONE', value: 'DONE'} ]
+  const STATUSOPTIONS = [
+    { text: '- - - - - - -', value: 'NONE' },
+    { text: 'NOT STARTED', value: 'NOT STARTED' },
+    { text: 'DOING', value: 'DOING' },
+    { text: 'DONE', value: 'DONE' }
+  ]
 
   return (
     <>
@@ -210,7 +213,11 @@ const Home: NextPage = () => {
               }}
             >
               <Select value={filteringStatus} onChange={filteringStatusChange}>
-                {STATUSOPTIONS.map(({value, text}) => <MenuItem key={value} value={value}>{text}</MenuItem>)}
+                {STATUSOPTIONS.map(({ value, text }) => (
+                  <MenuItem key={value} value={value}>
+                    {text}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>
