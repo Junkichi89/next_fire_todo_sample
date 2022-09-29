@@ -77,18 +77,20 @@ const Home: NextPage = () => {
   useEffect(() => {
     const unSub = onSnapshot(q, (querySnapshot) => {
       setTodos(
-        querySnapshot.docs.map((todo) => (
-          {
-          id: todo.data().id,
-          title: todo.data().title,
-          status: todo.data().status,
-          priority: todo.data().priority,
+        querySnapshot.docs.map((todo) => {
+          const {id, title, status, priority, isDraft, isTrash, author } = todo.data()
+        return {
+          id,
+          title,
+          status,
+          priority,
           create: parseTimestampToDate(todo.data().create, '-'),
           update: todo.data().update ? parseTimestampToDate(todo.data().update, '-') : '更新中',
-          isDraft: todo.data().isDraft,
-          isTrash: todo.data().isTrash,
-          author: todo.data().author
-        }))
+          isDraft,
+          isTrash,
+          author
+          }
+        })
       )
     })
     return () => unSub()
