@@ -36,6 +36,7 @@ import { parseTimestampToDate } from '../utils/DataFormat'
 import { useRecoilValue } from 'recoil'
 import { isLoginState, uidState } from '../atoms'
 import { useRouter } from 'next/router'
+import { STATUSOPTIONS, PRIORITYOPTIONS, FILTERINGPRIORITYOPTIONS, FILTERINGSTATUSOPTIONS } from '../constants/options'
 
 const Home: NextPage = () => {
   const [todos, setTodos] = useState([
@@ -118,17 +119,17 @@ const Home: NextPage = () => {
     setKeyword(event.target.value as string)
   }
 
-  const changeStatus = (e: SelectChangeEvent, id: string) => {
+  const changeStatus = async (e: SelectChangeEvent, id: string) => {
     const status = e.target.value
-    updateDoc(doc(db, 'todos', id), {
+    await updateDoc(doc(db, 'todos', id), {
       status,
       update: serverTimestamp()
     })
   }
 
-  const changePriority = (e: SelectChangeEvent, id: string) => {
+  const changePriority = async (e: SelectChangeEvent, id: string) => {
     const priority = e.target.value
-    updateDoc(doc(db, 'todos', id), {
+    await updateDoc(doc(db, 'todos', id), {
       priority,
       update: serverTimestamp()
     })
@@ -151,13 +152,6 @@ const Home: NextPage = () => {
       setSwitchTodos('all')
     }
   }
-
-  const STATUSOPTIONS = [
-    { text: '- - - - - - -', value: 'NONE' },
-    { text: 'NOT STARTED', value: 'NOT STARTED' },
-    { text: 'DOING', value: 'DOING' },
-    { text: 'DONE', value: 'DONE' }
-  ]
 
   return (
     <>
@@ -213,7 +207,7 @@ const Home: NextPage = () => {
               }}
             >
               <Select value={filteringStatus} onChange={filteringStatusChange}>
-                {STATUSOPTIONS.map(({ value, text }) => (
+                {FILTERINGSTATUSOPTIONS.map(({ value, text }) => (
                   <MenuItem key={value} value={value}>
                     {text}
                   </MenuItem>
@@ -234,10 +228,7 @@ const Home: NextPage = () => {
               }}
             >
               <Select value={filteringPriority} onChange={filteringPriorityChange}>
-                <MenuItem value="None">- - - - - - -</MenuItem>
-                <MenuItem value="Low">Low</MenuItem>
-                <MenuItem value="Middle">Middle</MenuItem>
-                <MenuItem value="High">High</MenuItem>
+                {FILTERINGPRIORITYOPTIONS.map(({ text, value }) => <MenuItem value={value}>{text}</MenuItem>)}
               </Select>
             </FormControl>
           </Box>
@@ -438,9 +429,7 @@ const Home: NextPage = () => {
                               height: '50px'
                             }}
                           >
-                            <MenuItem value="NOT STARTED">NOT STARTED</MenuItem>
-                            <MenuItem value="DOING">DOING</MenuItem>
-                            <MenuItem value="DONE">DONE</MenuItem>
+                            {STATUSOPTIONS.map(({ text, value }) => <MenuItem key={text} value={value}>{text}</MenuItem>)}
                           </Select>
                         </FormControl>
                       </TableCell>
@@ -456,9 +445,7 @@ const Home: NextPage = () => {
                               height: '50px'
                             }}
                           >
-                            <MenuItem value="Low">Low</MenuItem>
-                            <MenuItem value="Middle">Middle</MenuItem>
-                            <MenuItem value="High">High</MenuItem>
+                            {PRIORITYOPTIONS.map(({ text, value }) => <MenuItem key={text} value={value}>{text}</MenuItem>)}
                           </Select>
                         </FormControl>
                       </TableCell>
