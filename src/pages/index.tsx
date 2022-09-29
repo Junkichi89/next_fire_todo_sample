@@ -73,7 +73,8 @@ const Home: NextPage = () => {
   useEffect(() => {
     const unSub = onSnapshot(q, (querySnapshot) => {
       setTodos(
-        querySnapshot.docs.map((todo) => ({
+        querySnapshot.docs.map((todo) => (
+          {
           id: todo.data().id,
           title: todo.data().title,
           status: todo.data().status,
@@ -119,7 +120,7 @@ const Home: NextPage = () => {
   const changeStatus = (e: SelectChangeEvent, id: string) => {
     const status = e.target.value
     updateDoc(doc(db, 'todos', id), {
-      status: status,
+      status,
       update: serverTimestamp()
     })
   }
@@ -127,10 +128,11 @@ const Home: NextPage = () => {
   const changePriority = (e: SelectChangeEvent, id: string) => {
     const priority = e.target.value
     updateDoc(doc(db, 'todos', id), {
-      priority: priority,
+      priority,
       update: serverTimestamp()
     })
   }
+  
   const changeSort = (e: SelectChangeEvent) => {
     setSort(e.target.value)
 
@@ -149,6 +151,8 @@ const Home: NextPage = () => {
       setSwitchTodos('all')
     }
   }
+
+  const STATUSOPTIONS = [{ text: '- - - - - - -', value:'NONE'},  {text: 'NOT STARTED', value:'NOT STARTED'}, {text: 'DOING', value: 'DOING'}, {text: 'DONE', value: 'DONE'} ]
 
   return (
     <>
@@ -204,10 +208,7 @@ const Home: NextPage = () => {
               }}
             >
               <Select value={filteringStatus} onChange={filteringStatusChange}>
-                <MenuItem value="NONE">- - - - - - -</MenuItem>
-                <MenuItem value="NOT STARTED">NOT STARTED</MenuItem>
-                <MenuItem value="DOING">DOING</MenuItem>
-                <MenuItem value="DONE">DONE</MenuItem>
+                {STATUSOPTIONS.map(({value, text}) => <MenuItem key={value} value={value}>{text}</MenuItem>)}
               </Select>
             </FormControl>
           </Box>
